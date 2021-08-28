@@ -7,6 +7,11 @@ authors = ["Your Name <you@example.com>"]
 [tool.poetry.dependencies]
 python = "^3.8"
 Flask = "^2.0.1"
+pyfiglet = "^0.8.post1"
+replit = "^3.2.4"
+aiohttp = "^3.7.4"
+discord = "^1.7.3"
+keep = "^2.10.1"
 
 [tool.poetry.dev-dependencies]
 

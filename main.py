@@ -1,100 +1,107 @@
-from flask import Flask, redirect, render_template, request
-import json
+import discord
 import os
-from key_gen import assigner
-w_logs = []
-app = Flask('app')
+import json
+from discord.ext import commands, tasks
+from threading import Thread
+from replit import db
+from keep_alive import keep_alive
 
-def user(value):
-    if value == "KNDoSWe6U":
-      return "Iron"
-    elif value == "WvpIRvrjw":
-      return "Phil"
-    elif value == "meUbsGekh":
-      return "Verrus"
-    elif value == "g9fgLzaxh":
-      return "Chiko"
-    elif value == "mJkHzJeSu":
-      return "Ally"
-    elif value == "oBLv6BCPx":
-      return "Mike"
-    elif value == "sRPfQOKZ1":
-      return "Rave"
-    elif value == "cAiq4v8Es":
-      return "Emily"
-    elif value == "yA9WrgNHJ":
-      return "Adam"
-    elif value == "vk6KmL1bi":
-      return "Kun"
-    elif value == "avwuaPvEp":
-      return "Lime"
-    elif value == "a5WUsoDWm":
-      return "Sam"
-    elif value == "pWKi3MDXr":
-      return "Lemon"
-    elif value == "iudghQQaF":
-      return "Eli"
-    elif value == "N0VA":
-      return "Nova"
-    
-#   "Kun": "vk6KmL1bi", 
-#   "Lime": "avwuaPvEp", 
-#   "Sam": "a5WUsoDWm", 
-#   "Lemon": "pWKi3MDXr", 
-#   "Eli": "iudghQQaF", 
-#   "4162_ADMIN": "7mES3UObM"
+#imports ^
 
+intents = discord.Intents.default()
+intents.members = True
+intents.presences = True
 
-@app.route('/')
-def home():
-  return redirect("https://google.com/")
+#intents ^ 
 
-@app.route('/tag-team/<name>')
-def asd(name):
+def get_prefix(client, message):
 
-  with open(f"allowedKeys.json", "r") as logs:
-    l_logs = json.load(logs)
+    with open("prefixes.json", "r") as f:
+        prefixes = json.load(f)
 
-    key_values = [key for key in l_logs.values()]
-    key_name = [key for key in l_logs]
+    return prefixes[str(message.guild.id)]
 
-    if name == "7mES3UObM":
-      return render_template('4162_config.json')
-      with open("Weblogs.json", "r") as r:
-        l_r = json.load(r)
-        l_r["current user log in"] = user(value=name)
-      with open("Weblogs.json", "w") as r:
-        json.dump(l_r, r)
-    if name in key_values:
-      print(f"detected key {key_values} {name}")
-      return render_template('the-game.html', name=user(value=name))
+bot = commands.Bot(command_prefix=get_prefix, intents=intents)
+
+class Slash_support:
+  guild_ids = [G.id for G in bot.guilds]
+
+bot.author_id = 578789460141932555
+
+Initial_extentions = [
+	'cogs.bot2',
+  'cogs.Tags',
+  'cogs.main_cog',
+  'cogs.rtfm',
+  'cogs.Moderation',
+  #'cogs.weather',
   
-    else:
-      print(f"did not detect key {key_values} {name}")
-      return redirect("/")
+]
 
-@app.route('/logs/<name>')
-def logs(name):
-  if name == "KNDoSWe6U":
-    with open("Weblogs.json", "r") as f:
-      
-      return json.load(f)
+if __name__ == '__main__':  
+	for extension in Initial_extentions:
+		bot.load_extension(extension)
+
+@bot.event
+async def on_ready():
+  print("Logged in.")
+
+@bot.command()
+@commands.has_permissions(administrator = True)
+async def changeprefix(ctx, prefix):
+
+    with open("prefixes.json", "r") as f:
+        prefixes = json.load(f)
+
+    prefixes[str(ctx.guild.id)] = prefix
+
+    with open("prefixes.json", "w") as f:
+        json.dump(prefixes,f)    
+
+    await ctx.send(f"The prefix was changed to {prefix}")
     
-@app.route('/Data')
-def page():
-  return render_template("data-use.html")
 
-@app.route('/logs')
-def my_form():
-    return render_template('activity-searcher.html')
+@bot.listen("on_guild_join")
+async def am(guild):
+  with open("prefixes.json", "r") as f:
+    prefixes = json.load(f)
 
-@app.route('/logs/<name>', methods=['POST'])
-def my_form_post(name):
-    text = request.form['text']
-    processed_text = text
-    w_logs.append(processed_text)
-    return processed_text
+    prefixes[str(guild.id)] = "!"
 
-print(assigner.Create(integer=True))
-print(assigner.Create())
-app.run(host='0.0.0.0', port=8080,)
+    with open("prefixes.json", "w") as f:
+        json.dump(prefixes,f)
+
+@bot.event
+async def on_message(msg):
+
+    try:
+        if msg.mentions[0] == bot.user:
+
+            with open("prefixes.json", "r") as f:
+                prefixes = json.load(f)
+
+            pre = prefixes[str(msg.guild.id)] 
+
+            await msg.channel.send(f"My prefix for this server is `{pre}`")
+
+    except:
+        pass
+    await bot.process_commands(msg)
+
+@tasks.loop(hours=2)
+async def auto_update():
+  for filename in os.listdir('./cogs'):
+    if filename.endswith('.py'):
+      try:
+        bot.unload_extension(f'cogs.{filename[:-3]}')
+        bot.load_extension(f'cogs.{filename[:-3]}')
+      except Exception as E:
+        print(E)
+    else:
+      print(f'Unable to load {filename[:-3]}')
+    
+
+
+auto_update.start()
+keep_alive()
+bot.run(os.environ['token'])
