@@ -1,6 +1,7 @@
 import discord
 import asyncio
 import os
+import time
 from asyncio import sleep as s  
 import random
 Vbl_loader = [
@@ -114,6 +115,15 @@ class Commands(commands.Cog):
       await s(1*tm)
       embed = discord.Embed(title="Timer", description=f"timer set for 10 min\n time remaining {tm}", color=ctx.author.color, timestamp=ctx.message.created_at)
       await ctx.send(embed=embed)
+
+  @commands.command(name="ping")
+  async def ping(self, ctx: commands.Context):
+    """Get the bot's current websocket and API latency."""
+    start_time = time.time()
+    message = await ctx.send("Testing Ping...")
+    end_time = time.time()
+
+    await message.edit(content=f"Pong! {round(self.bot.latency * 1000)}ms\nAPI: {round((end_time - start_time) * 1000)}ms")
 
 
 def setup(bot):

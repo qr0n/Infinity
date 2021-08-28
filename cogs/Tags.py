@@ -2,7 +2,7 @@ import discord
 from replit import db
 from discord.ext import commands
 
-class Dnds(commands.Cog, name='Per server tags.'):
+class Dnds(commands.Cog, name='Per server tags'):
   '''These are the commands related to tag making'''
   def __init__(self, bot):
     self.bot = bot
