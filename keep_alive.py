@@ -38,6 +38,8 @@ def user(value):
     elif value == "N0VA":
       return "Nova"
     
+
+key_dict = {}
 #   "Kun": "vk6KmL1bi", 
 #   "Lime": "avwuaPvEp", 
 #   "Sam": "a5WUsoDWm", 

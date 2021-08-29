@@ -85,7 +85,7 @@ class Commands(commands.Cog):
     
   @commands.Cog.listener()
   async def on_command_error(self,ctx, error):
-    print(error)
+    raise error
 
   @commands.command()
   async def ranmem(self, ctx, member: discord.Member = None):
@@ -110,11 +110,16 @@ class Commands(commands.Cog):
       await author.send(embed=embed)
 
   @commands.command()
-  async def tier(self, ctx, tm=10):
-    while True:
-      await s(1*tm)
-      embed = discord.Embed(title="Timer", description=f"timer set for 10 min\n time remaining {tm}", color=ctx.author.color, timestamp=ctx.message.created_at)
-      await ctx.send(embed=embed)
+  async def timer(self, ctx, timer: int = None):
+    if timer is not None:
+      timer *= 1
+      embed = discord.Embed(title="Timer", description=f"{timer}", color=ctx.author.color, timestamp = ctx.message.created_at)
+      message = await ctx.send(embed=embed)
+      while timer > 0: 
+        timer -= 1
+        new = discord.Embed(title = "Timer", description=f"{timer} Minutes", color= ctx.author.color, timestamp = ctx.message.created_at)
+        await message.edit(embed=new)
+        await s(60)
 
   @commands.command(name="ping")
   async def ping(self, ctx: commands.Context):

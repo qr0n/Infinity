@@ -5,6 +5,7 @@ from discord.ext import commands, tasks
 from threading import Thread
 from replit import db
 from keep_alive import keep_alive
+from discord_slash import SlashCommand, SlashContext
 
 #imports ^
 
@@ -22,9 +23,7 @@ def get_prefix(client, message):
     return prefixes[str(message.guild.id)]
 
 bot = commands.Bot(command_prefix=get_prefix, intents=intents)
-
-class Slash_support:
-  guild_ids = [G.id for G in bot.guilds]
+slash = SlashCommand(bot, sync_commands=True, sync_on_cog_reload = True)
 
 bot.author_id = 578789460141932555
 
@@ -88,7 +87,7 @@ async def on_message(msg):
         pass
     await bot.process_commands(msg)
 
-@tasks.loop(hours=2)
+@tasks.loop(hours=1)
 async def auto_update():
   for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):
