@@ -10,7 +10,7 @@ class Dnds(commands.Cog, name='Per server tags'):
   @commands.command()
   #@commands.has_permissions(manage_guild=True)
   async def add_tag(self, ctx, tag_name, *, tag_response):
-    db[f"{ctx.guild.id}|{tag_name}"] = f"{tag_response}"
+    db[f"{ctx.guild.id}| {tag_name}"] = f"{tag_response}"
     await ctx.send("Tag added!")
   @commands.command()
   async def tag(self, ctx, tag):
@@ -18,7 +18,7 @@ class Dnds(commands.Cog, name='Per server tags'):
   
   @commands.command()
   async def tags(self, ctx):   
-    embed = discord.Embed(title="Guild tags.", description=",".join(db.prefix(f"{ctx.guild.id}|")[19:]))
+    embed = discord.Embed(title="Guild tags.", description=db.prefix(f"{ctx.guild.id}|")[19:])
     await ctx.send(embed=embed)
 
   @commands.command()

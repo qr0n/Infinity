@@ -34,13 +34,16 @@ Initial_extentions = [
   'cogs.rtfm',
   'cogs.Moderation',
   #'cogs.weather',
-  
+  'cogs.main_slash',
 ]
 
-if __name__ == '__main__':  
-	for extension in Initial_extentions:
-		bot.load_extension(extension)
-
+if __name__ == '__main__':
+  for extension in Initial_extentions:
+    try:
+      bot.load_extension(extension)
+    except Exception as E:
+      raise E
+      
 @bot.event
 async def on_ready():
   print("Logged in.")
